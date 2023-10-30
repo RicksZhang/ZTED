@@ -27,6 +27,8 @@ import java.util.Iterator;
 public class AdministratorController {
     @Autowired
     private AdministratorRepository administratorRepository;
+    @GetMapping(path = "/administrator/register")
+    public String showRegister(){return "register";}    //返回注册页面
 
     @PostMapping(path = "/administrator/register")     //管理员注册
     public String registerNewAdministrator(@RequestParam String name, @RequestParam String password, @RequestParam String email, @RequestParam String position, Model model) {
@@ -40,7 +42,7 @@ public class AdministratorController {
         if (savedAdministrator != null && savedAdministrator.getId() != null) {
             // 注册成功将跳转Login
             model.addAttribute("registerSuccess", "Successfully registered. Please log in.");
-            return "redirect:/administrator/login"; //重定向到登录页面
+            return "redirect:http://localhost:8080/ZTED/administrator/login"; //重定向到登录页面
         } else {
             model.addAttribute("registerError", "Register failed *_*");
             return "administrator/register"; //错误返回
@@ -59,7 +61,6 @@ public class AdministratorController {
         Administrator administrator = administratorRepository.findByEmail(email);
         if(administrator != null && Argon2Hasher.verifyPassword(password.toCharArray(),administrator.getPassword().getBytes())){   //密法验证逻辑使用argon2hash
             model.addAttribute("currentUser",administrator);   //使用session，保持登陆
-            //todo update  这个vx和你说了，重定向到一个登录成功的页面，你自己写个dashboard.html 即可
             return "redirect:/administrator/dashboard";
         }else {
             model.addAttribute("loginFalse","邮箱或密码输入错误，请重新输入");
