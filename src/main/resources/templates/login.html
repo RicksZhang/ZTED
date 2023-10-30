@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <form action="/administrator/login" method="post">
+        <h2>Login</h2>
+        <label for="email">Email:</label>
+        <input type="text" name="email" id="email" required/>
+
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+        <br>
+        <p th:text ="${loginFalse}"></p>
+
+        <button type="submit">Login</button>
+    </form>
+</div>
+</body>
+</html>
