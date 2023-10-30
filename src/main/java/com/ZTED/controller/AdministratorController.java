@@ -3,7 +3,6 @@ package com.ZTED.controller;
 import com.ZTED.config.Argon2Hasher;
 import com.ZTED.entity.Administrator;
 import com.ZTED.repository.AdministratorRepository;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Controller;
@@ -48,20 +47,24 @@ public class AdministratorController {
         }
     }
     @GetMapping("/administrator/login")
+//    @ResponseBody
     public String showLoginPage() {
-        System.out.println("testtestest");
-        return "administrator/login"; // 返回登录页面
+        return "login"; // 返回登录页面
     }
 
-    @PostMapping(path = "/administrator/login")    //管理员登陆
+    @PostMapping(path = "/administrator/login")
+//    @ResponseBody
+    //管理员登陆
     public String login(@RequestParam String email, @RequestParam String password, Model model){
         Administrator administrator = administratorRepository.findByEmail(email);
         if(administrator != null && Argon2Hasher.verifyPassword(password.toCharArray(),administrator.getPassword().getBytes())){   //密法验证逻辑使用argon2hash
             model.addAttribute("currentUser",administrator);   //使用session，保持登陆
+            //todo update  这个vx和你说了，重定向到一个登录成功的页面，你自己写个dashboard.html 即可
             return "redirect:/administrator/dashboard";
         }else {
             model.addAttribute("loginFalse","邮箱或密码输入错误，请重新输入");
-            return "/administrator/login";
+            //todo update
+            return "login";
         }
     }
 
