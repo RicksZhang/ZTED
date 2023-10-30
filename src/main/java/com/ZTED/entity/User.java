@@ -19,9 +19,9 @@ public class User {
     private String name;
     private String email;
     private String password;
-    @ManyToOne
-    @JoinColumn(name = "administrator_id", nullable = false)     //fk:administrator_id
-    private Administrator administrator;
+//    @ManyToOne
+//    @JoinColumn(name = "administrator_id", nullable = true)     //fk:administrator_id
+//    private Administrator administrator;
 
     public Integer getId() {
         return id;

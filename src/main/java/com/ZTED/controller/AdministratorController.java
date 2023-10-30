@@ -2,7 +2,9 @@ package com.ZTED.controller;
 
 import com.ZTED.config.Argon2Hasher;
 import com.ZTED.entity.Administrator;
+import com.ZTED.entity.User;
 import com.ZTED.repository.AdministratorRepository;
+import com.ZTED.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Controller;
@@ -27,6 +29,8 @@ import java.util.Iterator;
 public class AdministratorController {
     @Autowired
     private AdministratorRepository administratorRepository;
+    @Autowired
+    private UserRepository userRepository;
     @GetMapping(path = "/administrator/register")
     public String showRegister(){return "register";}    //返回注册页面
 
@@ -49,22 +53,24 @@ public class AdministratorController {
         }
     }
     @GetMapping("/administrator/login")
-//    @ResponseBody
     public String showLoginPage() {
         return "login"; // 返回登录页面
     }
 
     @PostMapping(path = "/administrator/login")
-//    @ResponseBody
     //管理员登陆
     public String login(@RequestParam String email, @RequestParam String password, Model model){
         Administrator administrator = administratorRepository.findByEmail(email);
-        if(administrator != null && Argon2Hasher.verifyPassword(password.toCharArray(),administrator.getPassword().getBytes())){   //密法验证逻辑使用argon2hash
-            model.addAttribute("currentUser",administrator);   //使用session，保持登陆
-            return "redirect:/administrator/dashboard";
-        }else {
+
+        // 用于获取哈希和盐。
+        byte[] storedHash = administrator.getHash();
+        byte[] storedSalt = administrator.getSalt();
+
+        if(administrator != null && Argon2Hasher.verifyPassword(password.toCharArray(), storedHash, storedSalt)) {
+            model.addAttribute("currentUser", administrator);
+            return "redirect:http://localhost:8080/ZTED/administrator/dashboard";
+        } else {
             model.addAttribute("loginFalse","邮箱或密码输入错误，请重新输入");
-            //todo update
             return "login";
         }
     }
@@ -76,8 +82,12 @@ public class AdministratorController {
 
     @GetMapping(path = "/administrator/dashboard")
     public String showDashboard (Model model){
-        Iterable<Administrator> getAllAdministrator = administratorRepository.findAll();
-        model.addAttribute("getAllUsers",getAllAdministrator);
-        return "administrator/dashboard";
+      if (model.getAttribute("currentUser") != null){
+          Iterable<User>getAllUsers = userRepository.findAll();
+          model.addAttribute("getAllUsers",getAllUsers);
+          return "dashboard";
+      }else {
+          return "redirect:http://localhost:8080/ZTED/administrator/login";   //   判定是否session有存储值，否则返回login
+      }
     }
 }

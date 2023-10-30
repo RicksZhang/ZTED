@@ -22,8 +22,26 @@ public class Administrator {
     private String password;
     private  String email;
     private String position;
-    @OneToMany(mappedBy = "administrator")
-    private List<User> users;
+    private byte[] hash;      // 新增
+    private byte[] salt;
+//    @OneToMany(mappedBy = "administrator")
+//    private List<User> users;
+
+    public byte[] getHash() {
+        return hash;
+    }
+
+    public void setHash(byte[] hash) {
+        this.hash = hash;
+    }
+
+    public byte[] getSalt() {
+        return salt;
+    }
+
+    public void setSalt(byte[] salt) {
+        this.salt = salt;
+    }
 
     public Integer getId() {
         return id;
@@ -61,11 +79,11 @@ public class Administrator {
         this.position = position;
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
+//    public List<User> getUsers() {
+//        return users;
+//    }
+//
+//    public void setUsers(List<User> users) {
+//        this.users = users;
+//    }
 }
