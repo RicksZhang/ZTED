@@ -49,6 +49,7 @@ public class AdministratorController {
     }
     @GetMapping("/administrator/login")
     public String showLoginPage() {
+        System.out.println("testtestest");
         return "administrator/login"; // 返回登录页面
     }
 
