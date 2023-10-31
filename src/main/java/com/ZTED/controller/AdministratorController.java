@@ -35,8 +35,14 @@ public class AdministratorController {
     public String showRegister(){return "register";}    //返回注册页面
 
     @PostMapping(path = "/administrator/register")     //管理员注册
-    public String registerNewAdministrator(@RequestParam String name, @RequestParam String password, @RequestParam String confirmPassword, @RequestParam String email, @RequestParam String position, Model model) {
+    public String registerNewAdministrator(@RequestBody Administrator newAdmin, Model model) {
         //密码检测
+        String name = newAdmin.getName();
+        String password = newAdmin.getPassword();
+        String email = newAdmin.getEmail();
+        String confirmPassword = newAdmin.getConfirmPassword();
+        String position = newAdmin.getPosition();
+
         if (!confirmPassword.equals(password)){
             model.addAttribute("registerError", "两次密码输入不匹配");
             return "register";
@@ -72,7 +78,9 @@ public class AdministratorController {
 
     @PostMapping(path = "/administrator/login")
     //管理员登陆
-    public String login(@RequestParam String email, @RequestParam String password, Model model){
+    public String login(@RequestBody Administrator loginRequest, Model model){
+        String email = loginRequest.getEmail();
+        String password = loginRequest.getPassword();
         Administrator administrator = administratorRepository.findByEmail(email);
         if (administrator == null) {
             model.addAttribute("loginFalse", "邮箱不存在，请重新输入或注册");

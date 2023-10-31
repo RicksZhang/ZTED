@@ -20,6 +20,8 @@ public class Administrator {
     private Integer id;      //pk:id
     private String name;
     private String password;
+    @Transient
+    private String confirmPassword;   //不存入数据库
     private  String email;
     private String position;
     private byte[] hash;      // 新增
@@ -79,7 +81,14 @@ public class Administrator {
         this.position = position;
     }
 
-//    public List<User> getUsers() {
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+    //    public List<User> getUsers() {
 //        return users;
 //    }
 //
