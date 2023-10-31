@@ -35,16 +35,27 @@ public class AdministratorController {
     public String showRegister(){return "register";}    //返回注册页面
 
     @PostMapping(path = "/administrator/register")     //管理员注册
-    public String registerNewAdministrator(@RequestParam String name, @RequestParam String password, @RequestParam String email, @RequestParam String position, Model model) {
+    public String registerNewAdministrator(@RequestParam String name, @RequestParam String password, @RequestParam String confirmPassword, @RequestParam String email, @RequestParam String position, Model model) {
+        //密码检测
+        if (!confirmPassword.equals(password)){
+            model.addAttribute("registerError", "两次密码输入不匹配");
+            return "register";
+        }
+        //邮箱重复注册检测
+        if (administratorRepository.findByEmail(email) != null){
+            model.addAttribute("registerError", "注册邮箱已存在");
+            return "register";
+        }
+        //注册逻辑
         Administrator administrator = new Administrator();
         administrator.setName(name);
-        Argon2Hasher.HashResult hashResult = Argon2Hasher.hashPassword(password.toCharArray());
+        Argon2Hasher.HashResult hashResult = Argon2Hasher.hashPassword(password.toCharArray());  //密码设置
         administrator.setHash(hashResult.hash);
         administrator.setSalt(hashResult.salt);
         administrator.setEmail(email);
         administrator.setPosition(position);
         Administrator savedAdministrator = administratorRepository.save(administrator);
-
+        //注册判断
         if (savedAdministrator != null && savedAdministrator.getId() != null) {
             // 注册成功将跳转Login
             model.addAttribute("registerSuccess", "Successfully registered. Please log in.");
@@ -70,7 +81,7 @@ public class AdministratorController {
         // 用于获取哈希和盐。
         byte[] storedHash = administrator.getHash();
         byte[] storedSalt = administrator.getSalt();
-
+        //登陆判定
         if(administrator != null && Argon2Hasher.verifyPassword(password.toCharArray(), storedHash, storedSalt)) {
             model.addAttribute("currentUser", administrator);
             return "redirect:http://localhost:8080/ZTED/administrator/dashboard";
@@ -79,14 +90,14 @@ public class AdministratorController {
             return "login";
         }
     }
-
-    @GetMapping(path = "/administrator/all")
-    public @ResponseBody Iterable<Administrator> getAllAdministrator(){
-        return administratorRepository.findAll();
-    }
-
+    //获取全部用户数据
+//    @GetMapping(path = "/administrator/all")
+//    public @ResponseBody Iterable<Administrator> getAllAdministrator(){
+//        return administratorRepository.findAll();
+//    }
+    //管理员面板
     @GetMapping(path = "/administrator/dashboard")
-    public String showDashboard (Model model){
+    public String showDashboard (Model model){    //获取全部用户信息
       if (model.getAttribute("currentUser") != null){
           Iterable<User>getAllUsers = userRepository.findAll();
           model.addAttribute("getAllUsers",getAllUsers);
@@ -95,4 +106,7 @@ public class AdministratorController {
           return "redirect:http://localhost:8080/ZTED/administrator/login";   //   判定是否session有存储值，否则返回login
       }
     }
+    //todo 修改密码方法
+    //todo 用户删除
+    //todo 管理员删除
 }
