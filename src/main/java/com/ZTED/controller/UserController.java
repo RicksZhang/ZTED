@@ -29,7 +29,9 @@ public class UserController {
         User user = new User();
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(Argon2Hasher.hashPassword(password.toCharArray()).toString());
+        Argon2Hasher.HashResult hashResult = Argon2Hasher.hashPassword(password.toCharArray());
+        user.setHash(hashResult.hash);
+        user.setSalt(hashResult.salt);
         userRepository.save(user);
         return "Saved";
     }

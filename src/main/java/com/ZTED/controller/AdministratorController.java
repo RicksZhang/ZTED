@@ -38,7 +38,9 @@ public class AdministratorController {
     public String registerNewAdministrator(@RequestParam String name, @RequestParam String password, @RequestParam String email, @RequestParam String position, Model model) {
         Administrator administrator = new Administrator();
         administrator.setName(name);
-        administrator.setPassword(Argon2Hasher.hashPassword(password.toCharArray()).toString());
+        Argon2Hasher.HashResult hashResult = Argon2Hasher.hashPassword(password.toCharArray());
+        administrator.setHash(hashResult.hash);
+        administrator.setSalt(hashResult.salt);
         administrator.setEmail(email);
         administrator.setPosition(position);
         Administrator savedAdministrator = administratorRepository.save(administrator);
@@ -61,7 +63,10 @@ public class AdministratorController {
     //管理员登陆
     public String login(@RequestParam String email, @RequestParam String password, Model model){
         Administrator administrator = administratorRepository.findByEmail(email);
-
+        if (administrator == null) {
+            model.addAttribute("loginFalse", "邮箱不存在，请重新输入或注册");
+            return "login";
+        }
         // 用于获取哈希和盐。
         byte[] storedHash = administrator.getHash();
         byte[] storedSalt = administrator.getSalt();
