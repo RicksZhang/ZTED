@@ -5,6 +5,7 @@ import com.ZTED.entity.Administrator;
 import com.ZTED.entity.User;
 import com.ZTED.repository.AdministratorRepository;
 import com.ZTED.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Controller;
@@ -31,10 +32,14 @@ public class AdministratorController {
     private AdministratorRepository administratorRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private HttpSession session;
     @GetMapping(path = "/administrator/register")
+    @CrossOrigin
     public String showRegister(){return "register";}    //返回注册页面
 
-    @PostMapping(path = "/administrator/register")     //管理员注册
+    @PostMapping(path = "/administrator/register")
+    @CrossOrigin //管理员注册
     public String registerNewAdministrator(@RequestBody Administrator newAdmin, Model model) {
         //密码检测
         String name = newAdmin.getName();
@@ -72,28 +77,47 @@ public class AdministratorController {
         }
     }
     @GetMapping("/administrator/login")
+    @CrossOrigin
     public String showLoginPage() {
         return "login"; // 返回登录页面
     }
 
     @PostMapping(path = "/administrator/login")
+    @CrossOrigin
     //管理员登陆
     public String login(@RequestBody Administrator loginRequest, Model model){
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
         Administrator administrator = administratorRepository.findByEmail(email);
-        if (administrator == null) {
+        if (administrator == null) {      //邮箱检测
             model.addAttribute("loginFalse", "邮箱不存在，请重新输入或注册");
             return "login";
         }
         // 用于获取哈希和盐。
         byte[] storedHash = administrator.getHash();
         byte[] storedSalt = administrator.getSalt();
+        Integer previousAttempts = (Integer) session.getAttribute("isCorrect");    //session 返回类为obj
+        if (previousAttempts == null){
+            previousAttempts =0;     //用户第一次登陆，尝试值初始化为0
+        }
+        Long lasAttemptTime= (Long) session.getAttribute("lastAttemptTime");
+        if (previousAttempts >= 5){
+            if (lasAttemptTime != null && (System.currentTimeMillis() - lasAttemptTime)<6000){
+                model.addAttribute("loginFalse","请一分钟后再尝试");
+                return "login";
+            }else {
+                session.setAttribute("isCorrect",0);
+                session.removeAttribute("lastAttemptTime");
+            }
+        }
         //登陆判定
         if(administrator != null && Argon2Hasher.verifyPassword(password.toCharArray(), storedHash, storedSalt)) {
             model.addAttribute("currentUser", administrator);
             return "redirect:http://localhost:8080/ZTED/administrator/dashboard";
         } else {
+            previousAttempts++;
+            session.setAttribute("isCorrect",previousAttempts);   //赋值计数器
+            session.setAttribute("lastAttemptTime",System.currentTimeMillis());   //跟踪登陆时间
             model.addAttribute("loginFalse","邮箱或密码输入错误，请重新输入");
             return "login";
         }
@@ -105,9 +129,10 @@ public class AdministratorController {
 //    }
     //管理员面板
     @GetMapping(path = "/administrator/dashboard")
+    @CrossOrigin
     public String showDashboard (Model model){    //获取全部用户信息
       if (model.getAttribute("currentUser") != null){
-          Iterable<User>getAllUsers = userRepository.findAll();
+          Iterable<User> getAllUsers = userRepository.findAll();
           model.addAttribute("getAllUsers",getAllUsers);
           return "dashboard";
       }else {

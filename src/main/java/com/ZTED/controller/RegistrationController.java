@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @Create Date: 29/10/2023 10:50 pm
  * @Version 1.0
  */
+@Controller
 
 public class RegistrationController {
+
 }

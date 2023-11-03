@@ -3,41 +3,6 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <title>管理员注册</title>
-  <script>
-    async function submitForm() {
-      const formData = {
-        name: document.getElementById('name').value,
-        password: document.getElementById('password').value,
-        confirmPassword: document.getElementById('confirmPassword').value,
-        email: document.getElementById('email').value,
-        position: document.getElementById('position').value
-      };
-
-      try {
-        const response = await fetch('http://localhost:8080/ZTED/administrator/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          if (result.status === 'success') {
-            window.location.href = '/ZTED/administrator/login';  //根据你的实际路径进行修改
-          } else {
-            // 其他处理，比如显示错误信息
-            document.getElementById('registerError').textContent = result.message;
-          }
-        } else {
-          console.log('Error:', response.status, response.statusText);
-        }
-      } catch (error) {
-        console.log('Fetch Error:', error);
-      }
-    }
-  </script>
 </head>
 <body>
 <h2>Register</h2>
