@@ -8,6 +8,7 @@ import com.ZTED.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,7 +43,7 @@ public class AdministratorController {
 
     @PostMapping(path = "/administrator/register")
     @CrossOrigin //管理员注册
-    public String registerNewAdministrator(@RequestBody Administrator newAdmin, Model model) {
+    public ResponseEntity<?> registerNewAdministrator(@RequestBody Administrator newAdmin, HttpSession session) {
         //密码检测
         String name = newAdmin.getName();
         String password = newAdmin.getPassword();
@@ -51,13 +52,16 @@ public class AdministratorController {
         String position = newAdmin.getPosition();
 
         if (!confirmPassword.equals(password)){
-            model.addAttribute("registerError", "两次密码输入不匹配");
-            return "register";
+//            model.addAttribute("registerError", "两次密码输入不匹配");
+            return ResponseEntity
+                    .status(400)
+                    .body(Map.of("registerError", "两次密码输入不匹配"));
         }
         //邮箱重复注册检测
         if (administratorRepository.findByEmail(email) != null){
-            model.addAttribute("registerError", "注册邮箱已存在");
-            return "register";
+            return ResponseEntity
+                    .status(404)
+                    .body(Map.of("registerError", "注册邮箱已存在"));
         }
         //注册逻辑
         Administrator administrator = new Administrator();
@@ -71,11 +75,11 @@ public class AdministratorController {
         //注册判断
         if (savedAdministrator != null && savedAdministrator.getId() != null) {
             // 注册成功将跳转Login
-            model.addAttribute("registerSuccess", "Successfully registered. Please log in.");
-            return "redirect:http://localhost:8080/ZTED/administrator/login"; //重定向到登录页面
+            return ResponseEntity.ok(Map.of("registerSuccess", "Successfully registered. Please log in.", "redirectUrl", "http://localhost:8080/ZTED/administrator/login"));
         } else {
-            model.addAttribute("registerError", "Register failed *_*");
-            return "administrator/register"; //错误返回
+            return ResponseEntity
+                    .status(403)
+                    .body(Map.of("registerError", "Register failed *_*"));
         }
     }
     @GetMapping("/administrator/login")
@@ -132,17 +136,17 @@ public class AdministratorController {
 //        return administratorRepository.findAll();
 //    }
     //管理员面板
-    @GetMapping(path = "/administrator/dashboard")
-    @CrossOrigin
-    public String showDashboard (Model model){    //获取全部用户信息
-      if (model.getAttribute("currentUser") != null){
-          Iterable<User> getAllUsers = userRepository.findAll();
-          model.addAttribute("getAllUsers",getAllUsers);
-          return "dashboard";
-      }else {
-          return "redirect:http://localhost:8080/ZTED/administrator/login";   //   判定是否session有存储值，否则返回login
-      }
-    }
+//    @GetMapping(path = "/administrator/dashboard")
+//    @CrossOrigin
+//    public String showDashboard (Model model){    //获取全部用户信息
+//      if (model.getAttribute("currentUser") != null){
+//          Iterable<User> getAllUsers = userRepository.findAll();
+//          model.addAttribute("getAllUsers",getAllUsers);
+//          return "dashboard";
+//      }else {
+//          return "redirect:http://localhost:8080/ZTED/administrator/login";   //   判定是否session有存储值，否则返回login
+//      }
+//    }
     //todo 修改密码方法
     //todo 用户删除
     //todo 管理员删除
