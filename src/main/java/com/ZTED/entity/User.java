@@ -18,6 +18,7 @@ public class User {
     private Integer id;    //PK:id
     private String name;
     private String email;
+    private String phoneNum;
     private String password;
     @Transient
     private String confirmPassword;
@@ -61,6 +62,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPhoneNum() {
+        return phoneNum;
+    }
+
+    public void setPhoneNum(String phoneNum) {
+        this.phoneNum = phoneNum;
     }
 
     public byte[] getHash() {

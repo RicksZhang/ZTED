@@ -34,6 +34,7 @@ public class UserController {
     public ResponseEntity<?> registerNewUsers (@RequestBody User newUser, HttpSession session){
         String name = newUser.getName();
         String email= newUser.getEmail();
+        String phoneUnm = newUser.getPhoneNum();
         String password = newUser.getPassword();
         String confirmPassword = newUser.getConfirmPassword();
         //重复输入密码检测
@@ -47,6 +48,21 @@ public class UserController {
             return ResponseEntity
                     .status(404)
                     .body(Map.of("registerError", "注册邮箱已存在"));
+        }
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPhoneNum(phoneUnm);
+        Argon2Hasher.HashResult hashResult = Argon2Hasher.hashPassword(password.toCharArray());
+        user.setHash(hashResult.hash);
+        user.setSalt(hashResult.salt);
+        User saveUser = userRepository.save(user);
+        if (saveUser != null && saveUser.getId() != null){
+            return ResponseEntity.ok(Map.of("registerSuccess", "Successfully registered. Please log in.", "redirectUrl", "http://localhost:8080/ZTED//user/login"));
+        }else {
+            return ResponseEntity
+                    .status(403)
+                    .body(Map.of("registerError", "Register failed *_*"));
         }
     }
     //todo user登陆
