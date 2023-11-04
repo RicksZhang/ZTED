@@ -8,12 +8,14 @@ import com.ZTED.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Class Name: AdministratorController
@@ -85,14 +87,15 @@ public class AdministratorController {
     @PostMapping(path = "/administrator/login")
     @CrossOrigin
     //管理员登陆
-    public String login(@RequestBody Administrator loginRequest, Model model){
+    public ResponseEntity<?> login(@RequestBody Administrator loginRequest, HttpSession session){
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
         Administrator administrator = administratorRepository.findByEmail(email);
-        if (administrator == null) {      //邮箱检测
-            model.addAttribute("loginFalse", "邮箱不存在，请重新输入或注册");
-            return "login";
-        }
+        if (administrator == null) {
+            return ResponseEntity
+                    .status(404)
+                    .body(Map.of("loginFalse", "邮箱不存在，请重新输入或注册"));
+        }     //todo 修改
         // 用于获取哈希和盐。
         byte[] storedHash = administrator.getHash();
         byte[] storedSalt = administrator.getSalt();
@@ -103,8 +106,9 @@ public class AdministratorController {
         Long lasAttemptTime= (Long) session.getAttribute("lastAttemptTime");
         if (previousAttempts >= 5){
             if (lasAttemptTime != null && (System.currentTimeMillis() - lasAttemptTime)<6000){
-                model.addAttribute("loginFalse","请一分钟后再尝试");
-                return "login";
+                return ResponseEntity
+                        .status(429)
+                        .body(Map.of("loginFalse", "请一分钟后再尝试"));   //todo 修改
             }else {
                 session.setAttribute("isCorrect",0);
                 session.removeAttribute("lastAttemptTime");
@@ -112,14 +116,14 @@ public class AdministratorController {
         }
         //登陆判定
         if(administrator != null && Argon2Hasher.verifyPassword(password.toCharArray(), storedHash, storedSalt)) {
-            model.addAttribute("currentUser", administrator);
-            return "redirect:http://localhost:8080/ZTED/administrator/dashboard";
+            return ResponseEntity.ok(Map.of("currentUser", administrator));   //todo 修改
         } else {
             previousAttempts++;
             session.setAttribute("isCorrect",previousAttempts);   //赋值计数器
             session.setAttribute("lastAttemptTime",System.currentTimeMillis());   //跟踪登陆时间
-            model.addAttribute("loginFalse","邮箱或密码输入错误，请重新输入");
-            return "login";
+            return ResponseEntity
+                    .status(400)
+                    .body(Map.of("loginFalse", "邮箱或密码输入错误，请重新输入"));  //todo 修改
         }
     }
     //获取全部用户数据

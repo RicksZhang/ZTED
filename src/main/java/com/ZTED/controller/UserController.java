@@ -23,21 +23,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
         private UserRepository userRepository;
+    //todo user注册
+    //todo user登陆
 
-    @PostMapping(path = "/user/register")      //添加用户
-    public @ResponseBody String registerNewUser (@RequestParam String name, @RequestParam String email, @RequestParam String password ){
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        Argon2Hasher.HashResult hashResult = Argon2Hasher.hashPassword(password.toCharArray());
-        user.setHash(hashResult.hash);
-        user.setSalt(hashResult.salt);
-        userRepository.save(user);
-        return "Saved";
-    }
-    @GetMapping(path = "/user/all")
-    public @ResponseBody Iterable<User> getAllUsers(){
-        return userRepository.findAll();
-    }
 
 }

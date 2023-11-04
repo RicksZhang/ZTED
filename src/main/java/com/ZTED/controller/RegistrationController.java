@@ -1,11 +1,16 @@
 package com.ZTED.controller;
 
 import com.ZTED.entity.Administrator;
+import com.ZTED.entity.RegistrationInfo;
+import com.ZTED.entity.User;
+import com.ZTED.repository.RegistrationRepository;
+import com.ZTED.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Class Name: RegistrationController
@@ -17,7 +22,50 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @Version 1.0
  */
 @Controller
-
+@RequestMapping(path="/ZTED")
 public class RegistrationController {
+    @Autowired
+    private RegistrationRepository registrationRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private HttpSession httpSession;
+    @GetMapping(path = "/registrationForm")
+    @CrossOrigin
+    public String showForm(){
+        return "registrationForm";
+    }
 
+    @PostMapping(path = "/registrationForm")
+    @CrossOrigin
+    public String submitRegistration (@RequestBody RegistrationInfo newRegistration, Model model){
+        Administrator currentUser =(Administrator) httpSession.getAttribute("currentUser");
+        String name = newRegistration.getName();
+        String phoneNum = newRegistration.getPhoneNum();
+        String companyName = newRegistration.getCompanyName();
+        String position = newRegistration.getPosition();
+        double annualRevenue = newRegistration.getAnnualRevenue();
+        String classType = newRegistration.getClassType();
+
+        RegistrationInfo registrationInfo = new RegistrationInfo();
+        registrationInfo.setName(name);
+        registrationInfo.setPhoneNum(phoneNum);
+        registrationInfo.setCompanyName(companyName);
+        registrationInfo.setPosition(position);
+        registrationInfo.setAnnualRevenue(annualRevenue);
+        registrationInfo.setClassType(classType);
+        if(currentUser != null){
+            RegistrationInfo saveRegistration = registrationRepository.save(registrationInfo);
+            if (saveRegistration != null){
+                model.addAttribute("successMessage","提交成功");
+                return "registrationSuccess";
+            }else {
+                model.addAttribute("errorMessage","提交失败，请重试");
+                return "registrationForm";
+            }
+        }else {
+            return "redirect:http://localhost:8080/ZTED/administrator/login";
+        }
+
+    }
 }
