@@ -19,6 +19,8 @@ public class User {
     private String name;
     private String email;
     private String password;
+    @Transient
+    private String confirmPassword;
     private byte[] hash;      // 新增
     private byte[] salt;
 //    @ManyToOne
@@ -27,6 +29,14 @@ public class User {
 
     public Integer getId() {
         return id;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 
     public String getName() {

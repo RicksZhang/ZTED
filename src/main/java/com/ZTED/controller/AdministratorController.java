@@ -46,8 +46,8 @@ public class AdministratorController {
     public ResponseEntity<?> registerNewAdministrator(@RequestBody Administrator newAdmin, HttpSession session) {
         //密码检测
         String name = newAdmin.getName();
-        String password = newAdmin.getPassword();
         String email = newAdmin.getEmail();
+        String password = newAdmin.getPassword();
         String confirmPassword = newAdmin.getConfirmPassword();
         String position = newAdmin.getPosition();
 
