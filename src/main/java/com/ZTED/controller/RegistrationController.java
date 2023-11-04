@@ -39,7 +39,7 @@ public class RegistrationController {
     @PostMapping(path = "/registrationForm")
     @CrossOrigin
     public String submitRegistration (@RequestBody RegistrationInfo newRegistration, Model model){
-        Administrator currentUser =(Administrator) httpSession.getAttribute("currentUser");
+        User currentUser =(User) httpSession.getAttribute("currentUser");
         String name = newRegistration.getName();
         String phoneNum = newRegistration.getPhoneNum();
         String companyName = newRegistration.getCompanyName();

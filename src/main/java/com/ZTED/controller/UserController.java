@@ -23,12 +23,16 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping(path = "/ZTED")
+@SessionAttributes("currentUser")
 public class UserController {
     @Autowired
         private UserRepository userRepository;
     @Autowired
         private HttpSession httpSession;
     //todo user注册
+    @GetMapping(path = "/user/register")
+    @CrossOrigin
+    public String showRegister(){return "register";}
     @PostMapping(path = "/user/register")
     @CrossOrigin
     public ResponseEntity<?> registerNewUsers (@RequestBody User newUser, HttpSession session){
@@ -66,6 +70,49 @@ public class UserController {
         }
     }
     //todo user登陆
-
-
+    @GetMapping("/user/login")
+    @CrossOrigin
+    public String showLoginPage() {
+        return "login"; // 返回登录页面
+    }
+    @PostMapping(path = "/user/login")
+    @CrossOrigin
+    public ResponseEntity<?> login(@RequestBody User loginUser, HttpSession session) {
+        String email = loginUser.getEmail();
+        String password = loginUser.getPassword();
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity
+                    .status(404)
+                    .body(Map.of("loginFalse", "邮箱不存在，请重新输入或注册"));
+        }
+        byte[] storedHash = user.getHash();
+        byte[] storedSalt = user.getSalt();
+        Integer previousAttempts = (Integer) session.getAttribute("isCorrect");
+        if (previousAttempts == null) {
+            previousAttempts = 0;     //用户第一次登陆，尝试值初始化为0
+        }
+        Long lasAttemptTime = (Long) session.getAttribute("lastAttemptTime");
+        if (previousAttempts >= 5) {
+            if (lasAttemptTime != null && (System.currentTimeMillis() - lasAttemptTime) < 6000) {
+                return ResponseEntity
+                        .status(429)
+                        .body(Map.of("loginFalse", "请一分钟后再尝试"));   //todo 修改
+            } else {
+                session.setAttribute("isCorrect", 0);
+                session.removeAttribute("lastAttemptTime");
+            }
+        }
+        //登陆判断逻辑
+        if (user != null && Argon2Hasher.verifyPassword(password.toCharArray(), storedHash, storedSalt)) {
+            return ResponseEntity.ok(Map.of("currentUser", user));
+        } else {
+            previousAttempts++;
+            session.setAttribute("isCorrect", previousAttempts);   //赋值计数器
+            session.setAttribute("lastAttemptTime", System.currentTimeMillis());//跟踪登陆时间
+            return ResponseEntity
+                    .status(400)
+                    .body(Map.of("loginFalse", "邮箱或密码输入错误，请重新输入"));  //todo 修改
+        }
+    }
 }
