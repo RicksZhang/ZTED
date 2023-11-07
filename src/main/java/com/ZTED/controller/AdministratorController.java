@@ -120,7 +120,7 @@ public class AdministratorController {
         }
         //登陆判定
         if(administrator != null && Argon2Hasher.verifyPassword(password.toCharArray(), storedHash, storedSalt)) {
-            return ResponseEntity.ok(Map.of("currentUser", administrator));   //todo 修改
+            return ResponseEntity.ok(Map.of("currentUser", administrator.getName(),"email",administrator.getEmail()));   //todo 修改
         } else {
             previousAttempts++;
             session.setAttribute("isCorrect",previousAttempts);   //赋值计数器

@@ -114,7 +114,7 @@ public class UserController {
             //todo user.setLast(new Date());
             user.setLastActivityTime(new Date());
             userRepository.save(user);
-            return ResponseEntity.ok(Map.of("LoginSuccess","登陆成功","Username", user.getName()));
+            return ResponseEntity.ok(Map.of("LoginSuccess","登陆成功","Username", user.getName(),"email",user.getEmail()));
         } else {
             user.setAttemptTimes(user.getAttemptTimes() + 1);
             user.setLasAttemptTimes(System.currentTimeMillis());
