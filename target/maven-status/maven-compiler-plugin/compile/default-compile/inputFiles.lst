@@ -1,0 +1,12 @@
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/entity/RegistrationInfo.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/config/Argon2Hasher.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/controller/AdministratorController.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/entity/User.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/controller/UserController.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/repository/RegistrationRepository.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/ZtedApplication.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/repository/UserRepository.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/entity/Administrator.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/controller/RegistrationController.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/restController/UserRestController.java
+/Users/mingxuanzhang/git/ZTED/src/main/java/com/ZTED/repository/AdministratorRepository.java

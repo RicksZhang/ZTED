@@ -22,6 +22,7 @@ public class User {
     private String name;
     private String email;
     private String phoneNum;
+    private int registerTimes = 0;
     @Transient
     private String password;
     @Transient
@@ -36,6 +37,14 @@ public class User {
 //    @JoinColumn(name = "administrator_id", nullable = true)     //fk:administrator_id
 //    private Administrator administrator;
 
+
+    public int getRegisterTimes() {
+        return registerTimes;
+    }
+
+    public void setRegisterTimes(int registerTimes) {
+        this.registerTimes = registerTimes;
+    }
 
     public long getLasAttemptTimes() {
         return lasAttemptTimes;

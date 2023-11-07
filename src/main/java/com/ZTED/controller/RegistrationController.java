@@ -27,7 +27,7 @@ import java.util.Map;
  * @Version 1.0
  */
 @Controller
-@RequestMapping(path="/ZTED")
+@RequestMapping(path = "/ZTED")
 public class RegistrationController {
     @Autowired
     private RegistrationRepository registrationRepository;
@@ -43,7 +43,7 @@ public class RegistrationController {
 
     @PostMapping(path = "/registrationForm")
     @CrossOrigin
-    public ResponseEntity<?> submitRegistration (@RequestBody RegistrationInfo newRegistration, HttpSession session){
+    public ResponseEntity<?> submitRegistration(@RequestBody RegistrationInfo newRegistration, HttpSession session) {
 //        User currentUser =(User) httpSession.getAttribute("currentUser");
         String email = newRegistration.getRegisterEmail().trim();
         String name = newRegistration.getName();
@@ -65,27 +65,36 @@ public class RegistrationController {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
+                    .status(404)
                     .body(Map.of("error", "用户未找到"));
+        }
+        if (user.getRegisterTimes() >= 5){
+            return ResponseEntity
+                    .status(429)
+                    .body(Map.of("error","一个账号最多提交5次报名信息"));
         }
         long currentTimeMillis = System.currentTimeMillis();
         long lastActivityTimeMillis = user.getLastActivityTime().getTime();
         long oneHourInMillis = 60 * 60 * 1000;
-        if(user.isLogin() && (currentTimeMillis - lastActivityTimeMillis) < oneHourInMillis) {
-                RegistrationInfo saveRegistration = registrationRepository.save(registrationInfo);
-                if (saveRegistration != null) {
+        if (user.isLogin() && (currentTimeMillis - lastActivityTimeMillis) < oneHourInMillis) {
+            user.setRegisterTimes(user.getRegisterTimes()+1);
+            userRepository.save(user);
+            RegistrationInfo saveRegistration = registrationRepository.save(registrationInfo);
+            if (saveRegistration != null) {
 //                model.addAttribute("successMessage","提交成功");
-                    return ResponseEntity.ok(Map.of("SubmitSuccess", "Successfully Submit", "redirectUrl", "http://localhost:8080/ZTED/user/login"));
-                } else {
-//                model.addAttribute("errorMessage","提交失败，请重试");
-                    return ResponseEntity
-                            .status(400)
-                            .body(Map.of("submitError", "Submit failed *_*"));
-                }
+                return ResponseEntity.ok(Map.of("SubmitSuccess", "Successfully Submit", "redirectUrl", "http://localhost:8080/ZTED/user/login"));
             } else {
+//                model.addAttribute("errorMessage","提交失败，请重试");
                 return ResponseEntity
-                        .status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "请重新登陆"));
+                        .status(400)
+                        .body(Map.of("submitError", "Submit failed *_*"));
             }
+        } else {
+            user.setLogin(false);
+            userRepository.save(user);
+            return ResponseEntity
+                    .status(401)
+                    .body(Map.of("error", "请重新登陆"));
+        }
     }
 }
