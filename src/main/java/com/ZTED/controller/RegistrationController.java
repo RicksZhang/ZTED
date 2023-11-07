@@ -35,46 +35,57 @@ public class RegistrationController {
     private UserRepository userRepository;
     @Autowired
     private HttpSession httpSession;
-    @GetMapping(path = "/registrationForm")
-    @CrossOrigin
-    public String showForm(){
-        return "registrationForm";
-    }
+//    @GetMapping(path = "/registrationForm")
+//    @CrossOrigin
+//    public String showForm(){
+//        return "registrationForm";
+//    }
 
     @PostMapping(path = "/registrationForm")
     @CrossOrigin
     public ResponseEntity<?> submitRegistration (@RequestBody RegistrationInfo newRegistration, HttpSession session){
-        User currentUser =(User) httpSession.getAttribute("currentUser");
+//        User currentUser =(User) httpSession.getAttribute("currentUser");
+        String email = newRegistration.getRegisterEmail().trim();
         String name = newRegistration.getName();
         String phoneNum = newRegistration.getPhoneNum();
         String companyName = newRegistration.getCompanyName();
         String position = newRegistration.getPosition();
-        double annualRevenue = newRegistration.getAnnualRevenue();
+        String annualRevenue = newRegistration.getAnnualRevenue();
         String classType = newRegistration.getClassType();
 
         RegistrationInfo registrationInfo = new RegistrationInfo();
+        registrationInfo.setRegisterEmail(email);
         registrationInfo.setName(name);
         registrationInfo.setPhoneNum(phoneNum);
         registrationInfo.setCompanyName(companyName);
         registrationInfo.setPosition(position);
         registrationInfo.setAnnualRevenue(annualRevenue);
         registrationInfo.setClassType(classType);
-        if(currentUser != null){
-            RegistrationInfo saveRegistration = registrationRepository.save(registrationInfo);
-            if (saveRegistration != null){
-//                model.addAttribute("successMessage","提交成功");
-                return ResponseEntity.ok(Map.of("SubmitSuccess", "Successfully Submit", "redirectUrl", "http://localhost:8080/ZTED/user/login"));
-            }else {
-//                model.addAttribute("errorMessage","提交失败，请重试");
-                return  ResponseEntity
-                        .status(400)
-                        .body(Map.of("submitError", "Submit failed *_*"));
-            }
-        }else {
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Location", "http://localhost:8080/ZTED/user/login");
-            return new ResponseEntity<>(headers, HttpStatus.FOUND);
-        }
 
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "用户未找到"));
+        }
+        long currentTimeMillis = System.currentTimeMillis();
+        long lastActivityTimeMillis = user.getLastActivityTime().getTime();
+        long oneHourInMillis = 60 * 60 * 1000;
+        if(user.isLogin() && (currentTimeMillis - lastActivityTimeMillis) < oneHourInMillis) {
+                RegistrationInfo saveRegistration = registrationRepository.save(registrationInfo);
+                if (saveRegistration != null) {
+//                model.addAttribute("successMessage","提交成功");
+                    return ResponseEntity.ok(Map.of("SubmitSuccess", "Successfully Submit", "redirectUrl", "http://localhost:8080/ZTED/user/login"));
+                } else {
+//                model.addAttribute("errorMessage","提交失败，请重试");
+                    return ResponseEntity
+                            .status(400)
+                            .body(Map.of("submitError", "Submit failed *_*"));
+                }
+            } else {
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "请重新登陆"));
+            }
     }
 }

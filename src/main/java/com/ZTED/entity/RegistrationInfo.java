@@ -22,14 +22,23 @@ public class RegistrationInfo {
     @JoinColumn(name = "user_id",referencedColumnName = "id")    //Fk: user_id
     private User user;
     private String name;
+    private String registerEmail;
     private  String phoneNum;
     private String companyName;
     private String position;
-    private double annualRevenue;
+    private String annualRevenue;
     private String classType;
 
     public Integer getId() {
         return id;
+    }
+
+    public String getRegisterEmail() {
+        return registerEmail;
+    }
+
+    public void setRegisterEmail(String registerEmail) {
+        this.registerEmail = registerEmail;
     }
 
     public String getPhoneNum() {
@@ -72,11 +81,11 @@ public class RegistrationInfo {
         this.position = position;
     }
 
-    public double getAnnualRevenue() {
+    public String getAnnualRevenue() {
         return annualRevenue;
     }
 
-    public void setAnnualRevenue(double annualRevenue) {
+    public void setAnnualRevenue(String annualRevenue) {
         this.annualRevenue = annualRevenue;
     }
 

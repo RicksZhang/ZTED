@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -26,29 +27,32 @@ import java.util.Map;
 @SessionAttributes("currentUser")
 public class UserController {
     @Autowired
-        private UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-        private HttpSession httpSession;
+    private HttpSession httpSession;
+
     //todo user注册
     @GetMapping(path = "/user/register")
-    @CrossOrigin
-    public String showRegister(){return "register";}
+    public String showRegister() {
+        return "register";
+    }
+
     @PostMapping(path = "/user/register")
     @CrossOrigin
-    public ResponseEntity<?> registerNewUsers (@RequestBody User newUser, HttpSession session){
+    public ResponseEntity<?> registerNewUsers(@RequestBody User newUser, HttpSession session) {
         String name = newUser.getName();
-        String email= newUser.getEmail();
-        String phoneUnm = newUser.getPhoneNum();
+        String email = newUser.getEmail();
+        String phoneNum = newUser.getPhoneNum();
         String password = newUser.getPassword();
         String confirmPassword = newUser.getConfirmPassword();
         //重复输入密码检测
-        if (!confirmPassword.equals(password)){
+        if (!confirmPassword.equals(password)) {
             return ResponseEntity
                     .status(400)
                     .body(Map.of("registerError", "两次密码输入不匹配"));
         }
         //邮箱重复检测
-        if (userRepository.findByEmail(email) != null){
+        if (userRepository.findByEmail(email) != null) {
             return ResponseEntity
                     .status(404)
                     .body(Map.of("registerError", "注册邮箱已存在"));
@@ -56,25 +60,27 @@ public class UserController {
         User user = new User();
         user.setName(name);
         user.setEmail(email);
-        user.setPhoneNum(phoneUnm);
+        user.setPhoneNum(phoneNum);
         Argon2Hasher.HashResult hashResult = Argon2Hasher.hashPassword(password.toCharArray());
         user.setHash(hashResult.hash);
         user.setSalt(hashResult.salt);
         User saveUser = userRepository.save(user);
-        if (saveUser != null && saveUser.getId() != null){
+        if (saveUser != null && saveUser.getId() != null) {
             return ResponseEntity.ok(Map.of("registerSuccess", "Successfully registered. Please log in.", "redirectUrl", "http://localhost:8080/ZTED//user/login"));
-        }else {
+        } else {
             return ResponseEntity
                     .status(403)
                     .body(Map.of("registerError", "Register failed *_*"));
         }
     }
+
     //todo user登陆
     @GetMapping("/user/login")
     @CrossOrigin
     public String showLoginPage() {
         return "login"; // 返回登录页面
     }
+
     @PostMapping(path = "/user/login")
     @CrossOrigin
     public ResponseEntity<?> login(@RequestBody User loginUser, HttpSession session) {
@@ -88,28 +94,31 @@ public class UserController {
         }
         byte[] storedHash = user.getHash();
         byte[] storedSalt = user.getSalt();
-        Integer previousAttempts = (Integer) session.getAttribute("isCorrect");
-        if (previousAttempts == null) {
-            previousAttempts = 0;     //用户第一次登陆，尝试值初始化为0
-        }
-        Long lasAttemptTime = (Long) session.getAttribute("lastAttemptTime");
-        if (previousAttempts >= 5) {
-            if (lasAttemptTime != null && (System.currentTimeMillis() - lasAttemptTime) < 6000) {
+        //多次输入密码逻辑判断
+        if (user.getAttemptTimes() >= 5) {
+            if (user.getLasAttemptTimes() != 0 && (System.currentTimeMillis() - user.getLasAttemptTimes()) < 60000) {
                 return ResponseEntity
                         .status(429)
-                        .body(Map.of("loginFalse", "请一分钟后再尝试"));   //todo 修改
+                        .body(Map.of("loginFalse", "请一分钟后再尝试"));
             } else {
-                session.setAttribute("isCorrect", 0);
-                session.removeAttribute("lastAttemptTime");
+                user.setAttemptTimes(0);  //重置登陆次数
+                user.setLasAttemptTimes(0);
             }
         }
         //登陆判断逻辑
         if (user != null && Argon2Hasher.verifyPassword(password.toCharArray(), storedHash, storedSalt)) {
-            return ResponseEntity.ok(Map.of("currentUser", user));
+            user.setAttemptTimes(0);   //重置登陆次数
+            user.setLasAttemptTimes(0);  //重置登陆时间
+            //todo user.setLoggedIn(true);
+            user.setLogin(true);   //登陆后改为true
+            //todo user.setLast(new Date());
+            user.setLastActivityTime(new Date());
+            userRepository.save(user);
+            return ResponseEntity.ok(Map.of("LoginSuccess","登陆成功"));
         } else {
-            previousAttempts++;
-            session.setAttribute("isCorrect", previousAttempts);   //赋值计数器
-            session.setAttribute("lastAttemptTime", System.currentTimeMillis());//跟踪登陆时间
+            user.setAttemptTimes(user.getAttemptTimes() + 1);
+            user.setLasAttemptTimes(System.currentTimeMillis());
+            userRepository.save(user);
             return ResponseEntity
                     .status(400)
                     .body(Map.of("loginFalse", "邮箱或密码输入错误，请重新输入"));  //todo 修改

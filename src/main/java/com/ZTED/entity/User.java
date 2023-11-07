@@ -2,6 +2,9 @@ package com.ZTED.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Arrays;
+import java.util.Date;
+
 /**
  * Class Name: User
  * Package: com.ZTED.entity
@@ -19,14 +22,52 @@ public class User {
     private String name;
     private String email;
     private String phoneNum;
+    @Transient
     private String password;
     @Transient
     private String confirmPassword;
+    private boolean isLogin = false;
+    private Date lastActivityTime;
+    private int attemptTimes = 0 ;
+    private long lasAttemptTimes;
     private byte[] hash;      // 新增
     private byte[] salt;
 //    @ManyToOne
 //    @JoinColumn(name = "administrator_id", nullable = true)     //fk:administrator_id
 //    private Administrator administrator;
+
+
+    public long getLasAttemptTimes() {
+        return lasAttemptTimes;
+    }
+
+    public void setLasAttemptTimes(long lasAttemptTimes) {
+        this.lasAttemptTimes = lasAttemptTimes;
+    }
+
+    public boolean isLogin() {
+        return isLogin;
+    }
+
+    public void setLogin(boolean login) {
+        isLogin = login;
+    }
+
+    public int getAttemptTimes() {
+        return attemptTimes;
+    }
+
+    public void setAttemptTimes(int attemptTimes) {
+        this.attemptTimes = attemptTimes;
+    }
+
+    public Date getLastActivityTime() {
+        return lastActivityTime;
+    }
+
+    public void setLastActivityTime(Date lastActivityTime) {
+        this.lastActivityTime = lastActivityTime;
+    }
 
     public Integer getId() {
         return id;
@@ -60,10 +101,6 @@ public class User {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getPhoneNum() {
         return phoneNum;
     }
@@ -87,4 +124,23 @@ public class User {
     public void setSalt(byte[] salt) {
         this.salt = salt;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNum='" + phoneNum + '\'' +
+                ", password='" + password + '\'' +
+                ", confirmPassword='" + confirmPassword + '\'' +
+                ", isLogin=" + isLogin +
+                ", lastActivityTime=" + lastActivityTime +
+                ", attemptTimes=" + attemptTimes +
+                ", lasAttemptTimes=" + lasAttemptTimes +
+                ", hash=" + Arrays.toString(hash) +
+                ", salt=" + Arrays.toString(salt) +
+                '}';
+    }
 }
+
