@@ -82,21 +82,21 @@ public class AdministratorController {
                     .body(Map.of("registerError", "Register failed *_*"));
         }
     }
-    @GetMapping("/authority")
-    @CrossOrigin
-    public ResponseEntity<?> getAuthority(@RequestBody Administrator authority) {
-        if (authority.getEmail() == null || authority.getEmail().isEmpty()){
-            return ResponseEntity
-                    .status(400)
-                    .body(Map.of("getAuthorityFalse", "权限认证失败"));
-        }
-        Administrator administrator = administratorRepository.findByEmail(authority.getEmail());
-        if (administrator.getPosition().equals("Level 1")){
-            return ResponseEntity.ok(Map.of("currentUser", administrator.getName(), "email", administrator.getEmail(),"position",administrator.getPosition()));
-        }else {
-            return ResponseEntity.status(403).body(Map.of("error", "权限不足"));
-        }
-    }
+//    @GetMapping("/authority")
+//    @CrossOrigin
+//    public ResponseEntity<?> getAuthority(@RequestBody Administrator authority) {
+//        if (authority.getEmail() == null || authority.getEmail().isEmpty()){
+//            return ResponseEntity
+//                    .status(400)
+//                    .body(Map.of("getAuthorityFalse", "权限认证失败"));
+//        }
+//        Administrator administrator = administratorRepository.findByEmail(authority.getEmail());
+//        if (administrator.getPosition().equals("Level 1")){
+//            return ResponseEntity.ok(Map.of("currentUser", administrator.getName(), "email", administrator.getEmail(),"position",administrator.getPosition()));
+//        }else {
+//            return ResponseEntity.status(403).body(Map.of("error", "权限不足"));
+//        }
+//    }
 
     @PostMapping(path = "/administrator/login")
     @CrossOrigin

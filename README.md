@@ -54,8 +54,8 @@
 429:"一个账号最多提交5次报名信息"
 400:"Submit failed *_*"
 401:"请重新登陆"
-# GET http://localhost:8080/ZTED/registerform
-# GET http://localhost:8080/ZTED/authority
+# GET http://localhost:8080/ZTED/registerform?adminEmail=
+# GET http://localhost:8080/ZTED/allUsers?adminEmail=
 {
 "email":""
 }

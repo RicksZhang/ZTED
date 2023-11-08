@@ -7,12 +7,14 @@ import com.ZTED.repository.AdministratorRepository;
 import com.ZTED.repository.RegistrationRepository;
 import com.ZTED.repository.UserProject;
 import com.ZTED.repository.UserRepository;
+import com.ZTED.service.Authority;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class Name: Dashborad
@@ -32,18 +34,30 @@ public class Dashborad {
     private AdministratorRepository administratorRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private Authority authority;
 
     @GetMapping(path = "/registerform")   //遍历所有报名信息，输出json
     @CrossOrigin
-    public ResponseEntity<List<RegistrationInfo>> getAllRegistrations() {
-        List<RegistrationInfo> registrationList = registrationRepository.findAll();
-        return ResponseEntity.ok(registrationList);
-    }
-    @GetMapping(path = "/allUsers")
-    @CrossOrigin
-    public ResponseEntity<List<UserProject>>getAllUsers(){
-        List<UserProject> userList = userRepository.findAllProjectedBy();
-        return ResponseEntity.ok(userList);
+    public ResponseEntity<?> getAllRegistrations(@RequestParam("adminEmail") String adminEmail) {
+        Administrator administrator = administratorRepository.findByEmail(adminEmail);
+        if (authority.getAuthority(administrator)) {
+            List<RegistrationInfo> registrationList = registrationRepository.findAll();
+            return ResponseEntity.ok(registrationList);
+        } else {
+            return ResponseEntity.status(400).body(Map.of("error", "权限不足"));
+        }
     }
 
+    @GetMapping(path = "/allUsers")
+    @CrossOrigin
+    public ResponseEntity<?> getAllUsers(@RequestParam("adminEmail") String adminEmail) {
+        Administrator administrator = administratorRepository.findByEmail(adminEmail);
+        if (authority.getAuthority(administrator)) {
+            List<UserProject> userList = userRepository.findAllProjectedBy();
+            return ResponseEntity.ok(userList);
+        } else {
+            return ResponseEntity.status(400).body(Map.of("error", "权限不足"));
+        }
+    }
 }
