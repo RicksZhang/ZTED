@@ -24,7 +24,7 @@ public class Dashborad {
     @Autowired
     private RegistrationRepository registrationRepository;
 
-    @GetMapping(path = "/dashborad")   //遍历所有报名信息，输出json
+    @GetMapping(path = "/registerform")   //遍历所有报名信息，输出json
     @CrossOrigin
     public ResponseEntity<List<RegistrationInfo>> getAllRegistrations() {
         List<RegistrationInfo> registrationList = registrationRepository.findAll();
