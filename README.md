@@ -55,5 +55,9 @@
 400:"Submit failed *_*"
 401:"请重新登陆"
 # GET http://localhost:8080/ZTED/registerform
+# GET http://localhost:8080/ZTED/authority
+{
+"email":""
+}
 
 

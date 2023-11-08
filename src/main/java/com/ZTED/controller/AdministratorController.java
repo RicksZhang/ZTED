@@ -82,10 +82,20 @@ public class AdministratorController {
                     .body(Map.of("registerError", "Register failed *_*"));
         }
     }
-    @GetMapping("/administrator/login")
+    @GetMapping("/authority")
     @CrossOrigin
-    public String showLoginPage() {
-        return "login"; // 返回登录页面
+    public ResponseEntity<?> getAuthority(@RequestBody Administrator authority) {
+        if (authority.getEmail() == null || authority.getEmail().isEmpty()){
+            return ResponseEntity
+                    .status(400)
+                    .body(Map.of("getAuthorityFalse", "权限认证失败"));
+        }
+        Administrator administrator = administratorRepository.findByEmail(authority.getEmail());
+        if (administrator.getPosition().equals("Level 1")){
+            return ResponseEntity.ok(Map.of("currentUser", administrator.getName(), "email", administrator.getEmail(),"position",administrator.getPosition()));
+        }else {
+            return ResponseEntity.status(403).body(Map.of("error", "权限不足"));
+        }
     }
 
     @PostMapping(path = "/administrator/login")
@@ -120,7 +130,7 @@ public class AdministratorController {
         }
         //登陆判定
         if(administrator != null && Argon2Hasher.verifyPassword(password.toCharArray(), storedHash, storedSalt)) {
-            return ResponseEntity.ok(Map.of("currentUser", administrator.getName(),"email",administrator.getEmail()));   //todo 修改
+            return ResponseEntity.ok(Map.of("currentUser", administrator.getName(), "email", administrator.getEmail(),"position",administrator.getPosition()));
         } else {
             previousAttempts++;
             session.setAttribute("isCorrect",previousAttempts);   //赋值计数器

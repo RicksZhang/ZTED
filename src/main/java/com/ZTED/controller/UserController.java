@@ -66,7 +66,7 @@ public class UserController {
         user.setSalt(hashResult.salt);
         User saveUser = userRepository.save(user);
         if (saveUser != null && saveUser.getId() != null) {
-            return ResponseEntity.ok(Map.of("registerSuccess", "Successfully registered. Please log in.", "redirectUrl", "http://localhost:8080/ZTED//user/login"));
+            return ResponseEntity.ok(Map.of("registerSuccess", "Successfully registered. Please log in.", "redirectUrl", "http://localhost:8080/ZTED/user/login"));
         } else {
             return ResponseEntity
                     .status(403)
