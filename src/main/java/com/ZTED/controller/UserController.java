@@ -109,9 +109,7 @@ public class UserController {
         if (user != null && Argon2Hasher.verifyPassword(password.toCharArray(), storedHash, storedSalt)) {
             user.setAttemptTimes(0);   //重置登陆次数
             user.setLasAttemptTimes(0);  //重置登陆时间
-            //todo user.setLoggedIn(true);
             user.setLogin(true);   //登陆后改为true
-            //todo user.setLast(new Date());
             user.setLastActivityTime(new Date());
             userRepository.save(user);
             return ResponseEntity.ok(Map.of("LoginSuccess","登陆成功","Username", user.getName(),"email",user.getEmail(),"loginTime",user.getLastActivityTime()));

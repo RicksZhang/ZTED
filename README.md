@@ -59,5 +59,6 @@
 {
 "email":""
 }
+# GET http://localhost:8080/ZTED/allUsers
 
 

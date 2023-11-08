@@ -1,7 +1,12 @@
 package com.ZTED.controller;
 
+import com.ZTED.entity.Administrator;
 import com.ZTED.entity.RegistrationInfo;
+import com.ZTED.entity.User;
+import com.ZTED.repository.AdministratorRepository;
 import com.ZTED.repository.RegistrationRepository;
+import com.ZTED.repository.UserProject;
+import com.ZTED.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,6 +28,10 @@ import java.util.List;
 public class Dashborad {
     @Autowired
     private RegistrationRepository registrationRepository;
+    @Autowired
+    private AdministratorRepository administratorRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping(path = "/registerform")   //遍历所有报名信息，输出json
     @CrossOrigin
@@ -30,4 +39,11 @@ public class Dashborad {
         List<RegistrationInfo> registrationList = registrationRepository.findAll();
         return ResponseEntity.ok(registrationList);
     }
+    @GetMapping(path = "/allUsers")
+    @CrossOrigin
+    public ResponseEntity<List<UserProject>>getAllUsers(){
+        List<UserProject> userList = userRepository.findAllProjectedBy();
+        return ResponseEntity.ok(userList);
+    }
+
 }
