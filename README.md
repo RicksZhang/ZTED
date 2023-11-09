@@ -60,8 +60,17 @@
 只有position = "1"才能通过权限
 # GET http://localhost:8080/ZTED/allAdmins?adminEmail=
 只有position = "1"才能通过权限
-# DELETE http://localhost:8080/ZTED/registration/{{id}}
-# DELETE http://localhost:8080/ZTED/administrator/{{email}}
-# DELETE http://localhost:8080/ZTED/user/{{email}}
+# DELETE http://localhost:8080/ZTED/registration/{id}adminEmail=
+204:删除成功，无返回
+404:未找到，无返回
+400:权限不足
+# DELETE http://localhost:8080/ZTED/administrator/{email}adminEmail=
+204:删除成功，无返回
+404:未找到，无返回
+400:权限不足
+# DELETE http://localhost:8080/ZTED/user/{deletemail}adminEmail=
+204:删除成功，无返回
+404:未找到，无返回
+400:权限不足
 
 

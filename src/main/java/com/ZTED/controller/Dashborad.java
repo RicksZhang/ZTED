@@ -70,35 +70,48 @@ public class Dashborad {
     }
     @DeleteMapping("/user/{email}")
     @CrossOrigin
-    public ResponseEntity<Void> deleteUser(@PathVariable("email") String email){
-        User user = userRepository.findByEmail(email);
-        if (user != null){
-            userRepository.delete(user);
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteUser(@PathVariable("email") String email,@RequestParam("adminEmail") String adminEmail){
+        Administrator administrator = administratorRepository.findByEmail(adminEmail);
+        if (authority.getAuthority(administrator)) {
+            User user = userRepository.findByEmail(email);
+            if (user != null) {
+                userRepository.delete(user);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).build();
         }
     }
     @DeleteMapping("/administrator/{email}")
     @CrossOrigin
-    public ResponseEntity<Void> deleteAdmin(@PathVariable("email") String email){
+    public ResponseEntity<Void> deleteAdmin(@PathVariable("email") String email,@RequestParam("adminEmail") String adminEmail){
         Administrator administrator = administratorRepository.findByEmail(email);
-        if (administrator != null){
-            administratorRepository.delete(administrator);
-            return ResponseEntity.noContent().build();
+        if (authority.getAuthority(administrator)) {
+            if (administrator != null) {
+                administratorRepository.delete(administrator);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).build();
         }
     }
     @DeleteMapping("/registration/{id}")
     @CrossOrigin
-    public ResponseEntity<Void> deleteRegistration (@PathVariable("id") Integer id){
+    public ResponseEntity<Void> deleteRegistration (@PathVariable("id") Integer id, @RequestParam("adminEmail") String adminEmail){
         RegistrationInfo registration = registrationRepository.getReferenceById(id);
-        if (registration != null){
-            registrationRepository.delete(registration);
-            return ResponseEntity.noContent().build();
+        if (authority.getAuthority(administrator)) {
+            if (registration != null) {
+                registrationRepository.delete(registration);
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(400).build();
         }
     }
 }
