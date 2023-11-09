@@ -82,21 +82,6 @@ public class AdministratorController {
                     .body(Map.of("registerError", "Register failed *_*"));
         }
     }
-//    @GetMapping("/authority")
-//    @CrossOrigin
-//    public ResponseEntity<?> getAuthority(@RequestBody Administrator authority) {
-//        if (authority.getEmail() == null || authority.getEmail().isEmpty()){
-//            return ResponseEntity
-//                    .status(400)
-//                    .body(Map.of("getAuthorityFalse", "权限认证失败"));
-//        }
-//        Administrator administrator = administratorRepository.findByEmail(authority.getEmail());
-//        if (administrator.getPosition().equals("Level 1")){
-//            return ResponseEntity.ok(Map.of("currentUser", administrator.getName(), "email", administrator.getEmail(),"position",administrator.getPosition()));
-//        }else {
-//            return ResponseEntity.status(403).body(Map.of("error", "权限不足"));
-//        }
-//    }
 
     @PostMapping(path = "/administrator/login")
     @CrossOrigin
@@ -140,24 +125,8 @@ public class AdministratorController {
                     .body(Map.of("loginFalse", "邮箱或密码输入错误，请重新输入"));
         }
     }
-    //获取全部用户数据
-//    @GetMapping(path = "/administrator/all")
-//    public @ResponseBody Iterable<Administrator> getAllAdministrator(){
-//        return administratorRepository.findAll();
-//    }
-    //管理员面板
-//    @GetMapping(path = "/administrator/dashboard")
-//    @CrossOrigin
-//    public String showDashboard (Model model){    //获取全部用户信息
-//      if (model.getAttribute("currentUser") != null){
-//          Iterable<User> getAllUsers = userRepository.findAll();
-//          model.addAttribute("getAllUsers",getAllUsers);
-//          return "dashboard";
-//      }else {
-//          return "redirect:http://localhost:8080/ZTED/administrator/login";   //   判定是否session有存储值，否则返回login
-//      }
-//    }
     //todo 修改密码方法
     //todo 用户删除
     //todo 管理员删除
+    //todo 报名表删除
 }

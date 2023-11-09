@@ -4,6 +4,8 @@ import com.ZTED.entity.Administrator;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Class Name: AdministratorRepository
  * Package: com.ZTED.repository
@@ -16,4 +18,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AdministratorRepository extends JpaRepository<Administrator,Integer> {
     Administrator findByEmail(String email);
+    List<AdminProject> findAllProjectedBy();
 }

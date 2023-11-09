@@ -55,10 +55,13 @@
 400:"Submit failed *_*"
 401:"请重新登陆"
 # GET http://localhost:8080/ZTED/registerform?adminEmail=
+只有position = "1"才能通过权限
 # GET http://localhost:8080/ZTED/allUsers?adminEmail=
-{
-"email":""
-}
-# GET http://localhost:8080/ZTED/allUsers
+只有position = "1"才能通过权限
+# GET http://localhost:8080/ZTED/allAdmins?adminEmail=
+只有position = "1"才能通过权限
+# DELETE http://localhost:8080/ZTED/registration/{{id}}
+# DELETE http://localhost:8080/ZTED/administrator/{{email}}
+# DELETE http://localhost:8080/ZTED/user/{{email}}
 
 

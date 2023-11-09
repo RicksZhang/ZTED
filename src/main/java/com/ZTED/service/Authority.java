@@ -25,14 +25,14 @@ public class Authority {
     public Authority(AdministratorRepository administratorRepository) {
         this.administratorRepository = administratorRepository;
     }
-    public boolean getAuthority( Administrator authority) {
-        if (authority.getEmail() == null || authority.getEmail().isEmpty()){
+    public boolean getAuthority( Administrator administrator) {
+        if (administrator.getEmail() == null ||administrator.getEmail().isEmpty()){
             return false;
         }
-        Administrator administrator = administratorRepository.findByEmail(authority.getEmail());
-        if (administrator ==null){
+        Administrator administratorVerify = administratorRepository.findByEmail(administrator.getEmail());
+        if ( administratorVerify ==null){
             return false;
         }
-        return "Level 1".equals(authority.getPosition()); // 权限检查通过条件
+        return "1".equals( administratorVerify.getPosition()); // 权限检查通过条件
         }
     }
