@@ -57,20 +57,22 @@ public class Dashborad {
             return ResponseEntity.status(400).body(Map.of("error", "权限不足"));
         }
     }
+
     @GetMapping(path = "/allAdmins")
     @CrossOrigin
-    public ResponseEntity<?> getAllAdmin(@RequestParam("adminEmail")String adminEmail){
+    public ResponseEntity<?> getAllAdmin(@RequestParam("adminEmail") String adminEmail) {
         Administrator administrator = administratorRepository.findByEmail(adminEmail);
-        if (authority.getAuthority(administrator)){
+        if (authority.getAuthority(administrator)) {
             List<AdminProject> adminList = administratorRepository.findAllProjectedBy();
             return ResponseEntity.ok(adminList);
-        }else {
+        } else {
             return ResponseEntity.status(400).body(Map.of("error", "权限不足"));
         }
     }
+
     @DeleteMapping("/user/{email}")
     @CrossOrigin
-    public ResponseEntity<Void> deleteUser(@PathVariable("email") String email,@RequestParam("adminEmail") String adminEmail){
+    public ResponseEntity<Void> deleteUser(@PathVariable("email") String email, @RequestParam("adminEmail") String adminEmail) {
         Administrator administrator = administratorRepository.findByEmail(adminEmail);
         if (authority.getAuthority(administrator)) {
             User user = userRepository.findByEmail(email);
@@ -80,37 +82,42 @@ public class Dashborad {
             } else {
                 return ResponseEntity.notFound().build();
             }
-        }else {
+        } else {
             return ResponseEntity.status(400).build();
         }
     }
+
     @DeleteMapping("/administrator/{email}")
     @CrossOrigin
-    public ResponseEntity<Void> deleteAdmin(@PathVariable("email") String email,@RequestParam("adminEmail") String adminEmail){
-        Administrator administrator = administratorRepository.findByEmail(email);
+    public ResponseEntity<Void> deleteAdmin(@PathVariable("email") String email, @RequestParam("adminEmail") String adminEmail) {
+        Administrator administrator = administratorRepository.findByEmail(adminEmail);
         if (authority.getAuthority(administrator)) {
-            if (administrator != null) {
-                administratorRepository.delete(administrator);
+            Administrator deleteAdministrator = administratorRepository.findByEmail(email);
+            if (deleteAdministrator != null) {
+                administratorRepository.delete(deleteAdministrator);
                 return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.notFound().build();
             }
-        }else {
+        } else {
             return ResponseEntity.status(400).build();
         }
     }
+
     @DeleteMapping("/registration/{id}")
     @CrossOrigin
-    public ResponseEntity<Void> deleteRegistration (@PathVariable("id") Integer id, @RequestParam("adminEmail") String adminEmail){
-        RegistrationInfo registration = registrationRepository.getReferenceById(id);
+    public ResponseEntity<Void> deleteRegistration(@PathVariable("id") Integer id, @RequestParam("adminEmail") String adminEmail) {
+        Administrator administrator = administratorRepository.findByEmail(adminEmail);
+
         if (authority.getAuthority(administrator)) {
+            RegistrationInfo registration = registrationRepository.getReferenceById(id);
             if (registration != null) {
                 registrationRepository.delete(registration);
                 return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.notFound().build();
             }
-        }else {
+        } else {
             return ResponseEntity.status(400).build();
         }
     }

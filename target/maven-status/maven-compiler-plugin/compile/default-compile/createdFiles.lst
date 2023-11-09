@@ -1,5 +1,8 @@
+com/ZTED/repository/AdminProject.class
 com/ZTED/entity/RegistrationInfo.class
 com/ZTED/controller/AdministratorController.class
+com/ZTED/repository/UserProject.class
+com/ZTED/controller/Dashborad.class
 com/ZTED/repository/UserRepository.class
 com/ZTED/repository/RegistrationRepository.class
 com/ZTED/entity/User.class
@@ -9,4 +12,5 @@ com/ZTED/ZtedApplication.class
 com/ZTED/repository/AdministratorRepository.class
 com/ZTED/config/Argon2Hasher.class
 com/ZTED/controller/UserController.class
+com/ZTED/service/Authority.class
 com/ZTED/config/Argon2Hasher$HashResult.class
